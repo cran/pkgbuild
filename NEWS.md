@@ -1,4 +1,13 @@
-# pkgbuild 0.0.0.9000
+# pkgbuild 1.0.1
+
+* `compile_dll()` now does not supply compiler flags if there is an existing
+  user defined Makevars file.
+
+* `local_build_tools()` function added to provide a deferred equivalent to
+  `with_build_tools()`. So you can add rtools to the PATH until the end of a
+  function body.
+
+# pkgbuild 1.0.0
 
 * Add metadata to support Rtools 3.5 (#38).
 

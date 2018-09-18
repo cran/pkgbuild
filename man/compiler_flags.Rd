@@ -7,7 +7,7 @@
 compiler_flags(debug = FALSE)
 }
 \arguments{
-\item{debug}{If \code{TRUE} adds \code{-g -Og} to all flags
+\item{debug}{If \code{TRUE} adds \code{-g -O0} to all flags
 (Adding \env{FFLAGS} and \env{FCFLAGS}}
 }
 \description{
@@ -27,3 +27,4 @@ compiler_flags(TRUE)
 \seealso{
 Other debugging flags: \code{\link{with_debug}}
 }
+\concept{debugging flags}
