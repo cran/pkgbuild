@@ -8,6 +8,7 @@
 #' @param env Additional environment variables to set. The defaults from
 #'   [callr::rcmd_safe_env()] are always set.
 #' @inheritParams with_build_tools
+#' @inheritParams build
 #' @export
 #' @examples
 #' # These env vars are always set
@@ -17,11 +18,45 @@
 #'   rcmd_build_tools("CONFIG", "CC")$stdout
 #'   rcmd_build_tools("CC", "--version")$stdout
 #' }
-rcmd_build_tools <- function(..., env = character(), required = TRUE) {
+rcmd_build_tools <- function(..., env = character(), required = TRUE, quiet = FALSE) {
   env <- c(callr::rcmd_safe_env(), env)
 
-  with_build_tools(
-    callr::rcmd_safe(..., env = env, spinner = FALSE),
+  warn_for_potential_errors()
+
+  res <- with_build_tools(
+    callr::rcmd_safe(..., env = env, spinner = FALSE, show = FALSE,
+      echo = FALSE, block_callback = block_callback(quiet)),
     required = required
   )
+
+  msg_for_long_paths(res)
+
+  invisible(res)
+}
+
+msg_for_long_paths <- function(output) {
+  if (is_windows() &&
+      any(grepl("over-long path length", output$stderr))) {
+    message(
+      "\nIt seems that this package contains files with very long paths.\n",
+      "This is not supported on most Windows versions. Please contact the\n",
+      "package authors and tell them about this. See this GitHub issue\n",
+      "for more details: https://github.com/r-lib/remotes/issues/84\n")
+  }
+}
+
+warn_for_potential_errors <- function() {
+  if (is_windows() && grepl(" ", R.home()) &&
+      getRversion() <= "3.4.2") {
+    warning(immediate. = TRUE,
+      "\n!!! Building will probably fail!\n",
+      "This version of R has trouble with building packages if\n",
+      "the R HOME directory (currently '", R.home(), "')\n",
+      "has space characters. Possible workarounds include:\n",
+      "- installing R to the C: drive,\n",
+      "- installing it into a path without a space, or\n",
+      "- creating a drive letter for R HOME via the `subst` windows command, and\n",
+      "  starting R from the new drive.\n",
+      "See also https://github.com/r-lib/remotes/issues/98\n")
+  }
 }
