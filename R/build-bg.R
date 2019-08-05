@@ -49,17 +49,21 @@ pkgbuild_process <- R6Class(
   public = list(
 
     initialize = function(path = ".", dest_path = NULL, binary = FALSE,
-                          vignettes = TRUE, manual = FALSE, args = NULL,
-                          needs_compilation = pkg_has_src(path),
+                          vignettes = TRUE, manual = FALSE, clean_doc = NULL,
+                          args = NULL, needs_compilation = pkg_has_src(path),
                           compile_attributes = FALSE,
                           register_routines = FALSE)
       rcb_init(self, private, super, path, dest_path, binary, vignettes,
-               manual, args, needs_compilation, compile_attributes, register_routines),
+               manual, clean_doc, args, needs_compilation, compile_attributes,
+               register_routines),
 
-    finalize = function() {
-      super$kill()
-      tryCatch(unlink(private$makevars_file), error = function(x) x)
-    },
+    finalize = function() super$kill(),
+
+    is_incomplete_error = function() FALSE,
+    read_all_error = function() "",
+    read_all_error_lines = function() character(),
+    read_error = function(n = -1) "",
+    read_error_lines = function(n = -1) character(),
 
     get_dest_path = function() private$dest_path,
 
@@ -79,17 +83,12 @@ pkgbuild_process <- R6Class(
       private$out_file
     },
 
-    kill = function(...) {
-      ret <- super$kill(...)
-      tryCatch(unlink(private$makevars_file), error = function(x) x)
-      ret
-    }
+    kill = function(...) super$kill(...)
   ),
 
   private = list(
     path = NULL,
     dest_path = NULL,
-    makevars_file = NULL,
     out_dir = NULL,
     out_file = NULL
   )
@@ -98,11 +97,12 @@ pkgbuild_process <- R6Class(
 #' @importFrom callr rcmd_process rcmd_process_options
 
 rcb_init <- function(self, private, super, path, dest_path, binary,
-                     vignettes, manual, args, needs_compilation,
+                     vignettes, manual, clean_doc, args, needs_compilation,
                      compile_attributes, register_routines) {
 
-  options <- build_setup(path, dest_path, binary, vignettes, manual, args,
-                         needs_compilation, compile_attributes, register_routines)
+  options <- build_setup(path, dest_path, binary, vignettes, manual, clean_doc,
+                         args, needs_compilation, compile_attributes,
+                         register_routines)
 
   private$path <- options$path
   private$dest_path <- options$dest_path
@@ -113,17 +113,11 @@ rcb_init <- function(self, private, super, path, dest_path, binary,
   options <- rcmd_process_options(
     cmd = options$cmd,
     cmdargs = c(options$path, options$args),
-    wd = options$out_dir
+    wd = options$out_dir,
+    stderr = "2>&1"
   )
 
-  ## We cannot use withr::with_makevars directly, because that removes
-  ## Makevars when exiting
-  flags <- compiler_flags(FALSE)
-  private$makevars_file <- tempfile()
-  withr::with_envvar(c(R_MAKEVARS_USER = private$makevars_file), {
-    withr::set_makevars(flags, new_path = private$makevars_file)
-    super$initialize(options)
-  })
+  super$initialize(options)
 
   invisible(self)
 }
