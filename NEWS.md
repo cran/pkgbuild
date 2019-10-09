@@ -1,3 +1,8 @@
+# pkgbuild 1.0.6
+
+* Support for RTools 40 and custom msys2 toolchains that are explicitly set
+  using the `CC` Makevars (#40).
+
 # pkgbuild 1.0.5
 
 * `check_build_tools()` gains a `quiet` argument, to control when the message
@@ -49,6 +54,8 @@
 * `build()` no longer sets compile flags (#46)
 
 # pkgbuild 1.0.1
+
+* Preliminary support for rtools 4.0 (#40)
 
 * `compile_dll()` now does not supply compiler flags if there is an existing
   user defined Makevars file.
