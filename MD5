@@ -1,6 +1,6 @@
-ffa15337c522a0e38b62cb0593888764 *DESCRIPTION
+11a4a1d1aa9b814bf150b7b7fb88eec6 *DESCRIPTION
 5322d4fe4bd99f9b09f113749440eb56 *NAMESPACE
-fd3a11cc4751de1416c24bef2fddb0df *NEWS.md
+63cc84ff6c7a1db89a01a123a08987bf *NEWS.md
 a12516d8c68e725848aeb582c164caa3 *R/build-bg.R
 33300800588fe78e9a1b04f014417a19 *R/build-tools.R
 129dfad978aee4d9b6b3cd207b2061c3 *R/build.R
@@ -19,7 +19,7 @@ a408aaa989410ef000caaa678c287d0a *R/rcpp-attributes.R
 117a59f38b4cfd3b073f7ee1fd4887bf *R/rtools-metadata.R
 f24838e0333dc2bc3a7ca6e8f27883d9 *R/rtools-path.R
 a47b642b208c96cd9886a023d1aca291 *R/rtools-registry.R
-d9d0d74a4fb5e49e5b34ac2622da691f *R/rtools.R
+cd2908dff95fd6f2d28df1534dde502c *R/rtools.R
 f005f154dcfde9d9b32708bd9eb8c76b *R/styles.R
 260b980b205829677986ac73ef43211c *R/utils.R
 969b0c7e558c9098e93a7a099428d993 *R/with-debug.R
