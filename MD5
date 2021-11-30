@@ -1,10 +1,10 @@
-4798a62dca453e6145f450e1c3bf4fe3 *DESCRIPTION
+7abfc584883ebf05ab96a852aa02cbca *DESCRIPTION
 4fef0023850b083f3071e2cac81c4cfc *LICENSE
-a0d112e8cacceeca3243da1df9c75a3a *NAMESPACE
-b2e881fcd1bc9a8c3507c09a51ac4b0b *NEWS.md
+a6990c99fedd15e111419a5263b82eca *NAMESPACE
+8aaa1b34b7a602a8bc3099a6023b7bc7 *NEWS.md
 8ff29851e32c103bafecd6667e16a853 *R/build-bg.R
 d67b67aab5c1106a62723b94bc40c205 *R/build-tools.R
-d9e2e01d13c70e1e793122b09de8f622 *R/build.R
+32dc0c2b4c2fb610c647e62cfdc529f7 *R/build.R
 eda7b2d34943dc06d742df73bc28b6f7 *R/c-registration.R
 8d41d120d4955be4a6fe8607ea96c174 *R/cache.R
 147e1846a39d0d14f73cbc14aa13d136 *R/callback.R
@@ -12,7 +12,7 @@ eda7b2d34943dc06d742df73bc28b6f7 *R/c-registration.R
 5350323d38eff4cbf7fe9c529a9aea28 *R/compiler-flags.R
 b110372f3b80823b810d4641c3af81b1 *R/compiler.R
 fd0876609b6b761c36cd165da7b7f146 *R/has_src.R
-649c3819a0e41c6ff6f32c845c435097 *R/latex.R
+a6445198e52e4121990a9aa2c7f60ff1 *R/latex.R
 3cd3bd83b3388ede17b657f6754778f1 *R/rcmd.R
 c37998c53f57819f4583805df967f2d5 *R/rtools-cache.R
 3685ed35d96d86d4c7c5e067ab52a478 *R/rtools-config.R
@@ -22,8 +22,8 @@ a47b642b208c96cd9886a023d1aca291 *R/rtools-registry.R
 b8b78606c2bda41140382aae1f372e7e *R/rtools.R
 f005f154dcfde9d9b32708bd9eb8c76b *R/styles.R
 260b980b205829677986ac73ef43211c *R/utils.R
-c88f3cd8c2658db01284f540930bcebd *R/with-debug.R
-4a198ed16de2354a64fdc41375149541 *README.md
+56102ca890043ea697041357bff69560 *R/with-debug.R
+28baee91d3b8b7fe522597c0c3b39e8f *README.md
 d24fe9abe55a133d83c94deb444e4f26 *man/build.Rd
 b16255149b3caf04d128de8053594c71 *man/clean_dll.Rd
 198cef1b4369df908bb67294a186d690 *man/compile_dll.Rd
@@ -39,7 +39,7 @@ cc1e8d29bc22e105566a563c65175d38 *man/pkg_links_to_rcpp.Rd
 fa69989496d2b1b4471e4c82948e599f *man/rcmd_build_tools.Rd
 356852ee1b8d4d73bde41307fbfb9964 *man/rtools_needed.Rd
 71e799d47a6458cdd95311616221a3d0 *man/with_debug.Rd
-d75062f8d4ff71e0cca79bf5c042be48 *man/without_compiler.Rd
+2e8086dd548443e4ad51c0aee9611ce1 *man/without_compiler.Rd
 d11922ac9eab43de2d4ff0bb06b9465e *tests/build-tools.R
 2fb58861d239d4cb77f513d8657104ea *tests/testthat.R
 335cf2b43bac47c1f492e231cb977233 *tests/testthat/fixtures/testDummy_0.1.tar.gz
@@ -49,7 +49,7 @@ aef8f02891aa60e66955e23356e6e3a4 *tests/testthat/fixtures/xxx.gz
 267812fc7bc60f0a742afcfc33acfc62 *tests/testthat/fixtures/xxx.zip
 c4bd7c279a480670f6ed045720f69e9c *tests/testthat/test-archives.R
 3b2fbd3fd4b2a1d84bca24ea96945c75 *tests/testthat/test-build-process.r
-ee4895dbaad648238db6f220ee47dac9 *tests/testthat/test-build.r
+1db2b5ee4c2317c835dba1059413c749 *tests/testthat/test-build.r
 d1b687fc83746b673c905f50e955a5d9 *tests/testthat/test-build_tools.R
 f62ac607e714ae6245ebb61469586880 *tests/testthat/test-c-registration.R
 6a367497c505998a782524a57579e3da *tests/testthat/test-compile_dll.R

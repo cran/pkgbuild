@@ -124,22 +124,25 @@ build_setup_source <- function(path, dest_path, vignettes, manual, clean_doc,
     args <- c(args, "--no-resave-data")
   }
 
-  if (manual && !has_latex()) {
+  if (!manual) {
+    args <- unique(c(args, "--no-manual"))
+  }
+
+  if (!vignettes) {
+    args <- unique(c(args, "--no-build-vignettes"))
+  }
+
+  no_manual <- "--no-manual" %in% args
+  if (!no_manual && !has_latex()) {
     message("pdflatex not found! Not building PDF manual.")
-    manual <- FALSE
   }
 
   if (needs_compilation && (vignettes || manual)) {
     check_build_tools(quiet = TRUE)
   }
 
-  if (!manual) {
-    args <- c(args, "--no-manual")
-  }
-
-  if (!vignettes) {
-    args <- c(args, "--no-build-vignettes")
-  } else if (is.null(clean_doc) || isTRUE(clean_doc)) {
+  build_vignettes <- !("--no-build-vignettes" %in% args)
+  if (build_vignettes && (is.null(clean_doc) || isTRUE(clean_doc))) {
     doc_dir <- file.path(path, "inst", "doc")
     if (dir.exists(doc_dir)) {
       if (is.null(clean_doc) && interactive()) {
