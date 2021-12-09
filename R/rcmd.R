@@ -23,11 +23,22 @@ rcmd_build_tools <- function(..., env = character(), required = TRUE, quiet = FA
 
   warn_for_potential_errors()
 
-  res <- with_build_tools(
-    callr::rcmd_safe(..., env = env, spinner = FALSE, show = FALSE,
-      echo = FALSE, block_callback = block_callback(quiet), stderr = "2>&1"),
-    required = required
-  )
+  callback <- if (cli::is_dynamic_tty()) {
+    block_callback(quiet)
+  } else {
+    simple_callback(quiet)
+  }
+
+  res <- with_build_tools({
+    withCallingHandlers(
+      callr::rcmd_safe(..., env = env, spinner = FALSE, show = FALSE,
+        echo = FALSE, block_callback = callback, stderr = "2>&1"),
+      error = function(e) {
+        if (!quiet) e$echo <- TRUE
+        asNamespace("callr")$err$throw(e)
+      }
+    )
+  }, required = required)
 
   msg_for_long_paths(res)
 

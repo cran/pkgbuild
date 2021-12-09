@@ -1,6 +1,16 @@
-# pkgbuild 1.2.1
+# pkgbuild 1.3.0
 
-# pkgbuild (development)
+* pkgbuild now supports Rtools 4.2.
+
+* pkgbuild now returns the correct path for R 3.x (#96).
+
+* `build()` now always returns the path of the built package (#108).
+
+* pkgbuild output now looks better in `.Rmd` documents and in general in non-dynamic terminals. You can also force dynamic and non-dynamic output now (#64).
+
+* pkgbuild does not build the PDF manual now if `pdflatex` is not installed, even if `manual = TRUE` (#123).
+
+# pkgbuild 1.2.1
 
 * Gábor Csárdi is now the maintainer.
 

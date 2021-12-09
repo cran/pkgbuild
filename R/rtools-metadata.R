@@ -65,12 +65,17 @@ version_info <- list(
   ),
   "4.0" = list(
     version_min = "4.0.0",
+    version_max = "4.1.99",
+    path = "usr/bin"
+  ),
+  "4.2" = list(
+    version_min = "4.2.0",
     version_max = "99.99.99",
     path = "usr/bin"
   ),
   "custom" = list(
     version_min = "2.10.0",
     version_max = "99.99.99",
-    path = "usr/bin"
+    path = if (getRversion() >= "4.0.0") "usr/bin" else "bin"
   )
 )

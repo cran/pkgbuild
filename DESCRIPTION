@@ -1,6 +1,6 @@
 Package: pkgbuild
 Title: Find Tools Needed to Build R Packages
-Version: 1.2.1
+Version: 1.3.0
 Authors@R: c(
     person("Hadley", "Wickham", role = "aut"),
     person("Jim", "Hester", , role = "aut"),
@@ -15,16 +15,16 @@ Imports: callr (>= 3.2.0), cli, crayon, desc, prettyunits, R6,
 Suggests: Rcpp, cpp11, testthat, covr
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.1.2
+RoxygenNote: 7.1.2.9000
 URL: https://github.com/r-lib/pkgbuild
 BugReports: https://github.com/r-lib/pkgbuild/issues
 Depends: R (>= 3.1)
 NeedsCompilation: no
-Packaged: 2021-11-30 00:10:14 UTC; jhester
+Packaged: 2021-12-09 15:32:16 UTC; gaborcsardi
 Author: Hadley Wickham [aut],
   Jim Hester [aut],
   Gábor Csárdi [aut, cre],
   RStudio [cph]
 Maintainer: Gábor Csárdi <csardi.gabor@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-11-30 13:50:02 UTC
+Date/Publication: 2021-12-09 17:10:02 UTC
