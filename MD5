@@ -1,7 +1,7 @@
-0888d356b6b2901ac23cd1bf788e0372 *DESCRIPTION
+b81242cb42d3fc8a52f40aa8b2c9e33b *DESCRIPTION
 4fef0023850b083f3071e2cac81c4cfc *LICENSE
 a6990c99fedd15e111419a5263b82eca *NAMESPACE
-b7b583df0623cc5fb344ec3b33491ca4 *NEWS.md
+db4f1970d87d1b4fec7d6bca147affeb *NEWS.md
 8ff29851e32c103bafecd6667e16a853 *R/build-bg.R
 d67b67aab5c1106a62723b94bc40c205 *R/build-tools.R
 7d96d2d272d432bc7e4dc6ec54cee3f3 *R/build.R
@@ -16,10 +16,10 @@ a6445198e52e4121990a9aa2c7f60ff1 *R/latex.R
 d46600def40aa79e19d394c141232ce1 *R/rcmd.R
 c37998c53f57819f4583805df967f2d5 *R/rtools-cache.R
 3685ed35d96d86d4c7c5e067ab52a478 *R/rtools-config.R
-3b5ed7877fdfe3bcb8cc833683311a9b *R/rtools-metadata.R
+d5d2e8c13dfa06782175b79e2f4661f9 *R/rtools-metadata.R
 f24838e0333dc2bc3a7ca6e8f27883d9 *R/rtools-path.R
 a47b642b208c96cd9886a023d1aca291 *R/rtools-registry.R
-4b3e88e5597e212168b79cd985299ac0 *R/rtools.R
+7c94ec5f9a80dc34635fa128bed37cd2 *R/rtools.R
 f005f154dcfde9d9b32708bd9eb8c76b *R/styles.R
 260b980b205829677986ac73ef43211c *R/utils.R
 56102ca890043ea697041357bff69560 *R/with-debug.R
