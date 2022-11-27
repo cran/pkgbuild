@@ -1,4 +1,3 @@
-context("build")
 
 # Package build setup ----------------------------------------------------
 
@@ -9,7 +8,7 @@ test_that("with*_latex context fixtures force has_latex result", {
   # one of them should be different from default
   expect_true({
     with_latex(has_latex()) != has_latex() ||
-    without_latex(has_latex()) != has_latex()
+      without_latex(has_latex()) != has_latex()
   })
 })
 
@@ -68,7 +67,7 @@ test_that("source build setup accept args and/or parameterized helpers", {
   expect_true(!"--no-build-vignettes" %in% res$args)
 
   # expect `vignettes=FALSE` to affect build --no-build-vignettes flag
-  expect_silent(res <-build_setup_source(
+  expect_silent(res <- build_setup_source(
     file.path(testthat::test_path(), "testDummy"),
     file.path(tempdir(), "testDummyBuild"),
     vignettes = FALSE,
@@ -144,9 +143,11 @@ test_that("package tarball binary build", {
   path <- build("testDummy", dest_path = tempdir(), quiet = TRUE)
   on.exit(unlink(path), add = TRUE)
 
-  path2 <- build(path, dest_path = tempdir(), quiet = TRUE,
-                 binary = TRUE, needs_compilation = FALSE,
-                 compile_attributes = FALSE)
+  path2 <- build(path,
+    dest_path = tempdir(), quiet = TRUE,
+    binary = TRUE, needs_compilation = FALSE,
+    compile_attributes = FALSE
+  )
   on.exit(unlink(path2), add = TRUE)
   expect_true(file.exists(path2))
   expect_false(is.na(desc::desc(path2)$get("Packaged")))
@@ -159,9 +160,98 @@ test_that("package tarball binary build errors", {
 
   expect_error(
     build(path, dest_path = tempdir(), quiet = TRUE),
-    "binary")
+    "binary"
+  )
   expect_error(
-    build(path, dest_path = tempdir(), quiet = TRUE, binary = TRUE,
-          needs_compilation = FALSE, compile_attributes = TRUE),
-    "compile_attributes")
+    build(path,
+      dest_path = tempdir(), quiet = TRUE, binary = TRUE,
+      needs_compilation = FALSE, compile_attributes = TRUE
+    ),
+    "compile_attributes"
+  )
+})
+
+test_that("warnings can be turned into errors", {
+  src <- withr::local_tempdir()
+  dest <- withr::local_tempdir()
+  file.copy(test_path("testDummy"), src, recursive = TRUE)
+
+  withr::local_options(pkg.build_stop_for_warnings = TRUE)
+  expect_silent(
+    build(file.path(src, "testDummy"), dest_path = dest, quiet = TRUE)
+  )
+
+  dir.create(file.path(src, "testDummy", "inst"), recursive = TRUE, showWarnings = FALSE)
+  saveRDS(1:10, file.path(src, "testDummy", "inst", "testthat-problems.rds"))
+
+  # No warning/error on R <= 3.5
+  if (getRversion() <= "3.6") skip("Needs R 3.5.0")
+
+  # Warning looks different on older R
+  if (getRversion() >= "4.1") {
+    expect_snapshot(
+      error = TRUE,
+      build(file.path(src, "testDummy"), dest_path = dest, quiet = TRUE),
+      transform = function(x) {
+        x <- sub("\u2018", "'", x, fixed = TRUE)
+        x <- sub("\u2019", "'", x, fixed = TRUE)
+        x <- sub("checking for file '.*'", "checking for file '<file>'", x)
+        x
+      }
+    )
+  } else {
+    expect_error(
+      suppressMessages(build(
+        file.path(src, "testDummy"),
+        dest_path = dest,
+        quiet = TRUE
+      ))
+    )
+  }
+})
+
+test_that("Config/build/clean-inst-doc FALSE", {
+  dest <- withr::local_tempdir()
+  expect_silent(
+    build(
+      test_path("testInstDoc"),
+      dest_path = dest,
+      quiet = TRUE,
+      vignettes = TRUE,
+      clean_doc = NULL
+    )
+  )
+  pkg <- file.path(dest, dir(dest))
+  expect_true(length(pkg) == 1)
+  expect_true(file.exists(pkg))
+  pkg_files <- untar(pkg, list = TRUE)
+  expect_true("testInstDoc/inst/doc/keep.me" %in% pkg_files)
+  expect_true("testInstDoc/inst/doc/test.html" %in% pkg_files)
+})
+
+test_that("Config/build/clean-inst-doc TRUE", {
+  src <- withr::local_tempdir()
+  dest <- withr::local_tempdir()
+  file.copy(test_path("testInstDoc"), src, recursive = TRUE)
+
+  desc::desc_set(
+    "Config/build/clean-inst-doc" = "TRUE",
+    file = file.path(src, "testInstDoc")
+  )
+
+  expect_silent(
+    build(
+      file.path(src, "testInstDoc"),
+      dest_path = dest,
+      quiet = TRUE,
+      vignettes = TRUE,
+      clean_doc = NULL
+    )
+  )
+  pkg <- file.path(dest, dir(dest))
+  expect_true(length(pkg) == 1)
+  expect_true(file.exists(pkg))
+  pkg_files <- untar(pkg, list = TRUE)
+  expect_false("testInstDoc/inst/doc/keep.me" %in% pkg_files)
+  expect_true("testInstDoc/inst/doc/test.html" %in% pkg_files)
 })

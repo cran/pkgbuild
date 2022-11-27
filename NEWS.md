@@ -1,3 +1,28 @@
+# pkgbuild 1.4.0
+
+* pkgbuild can now avoid copying large package directories when building a
+  source package. See the `PKG_BUILD_COPY_METHOD` enviroment variable in
+  `?build` or the package README (#59).
+
+  This is currently an experimental feature, and feedback is
+  appreciated.
+
+* `R CMD build` warnings can now be turned into errors, by setting the
+  `pkg.build_stop_for_warnings` option to `TRUE` or by setting the
+  `PKG_BUILD_STOP_FOR_WARNINGS` environment variable to `true` (#114).
+
+* `need_compile()` now knows about Rust source code files, i.e. `Cargo.toml`
+  and `*.rs` (#115).
+
+* Now `pkgbuild::build()` will not clean up `inst/doc` by default if the
+  `Config/build/clean-inst-doc` entry in `DESCRIPTION` is set to `FALSE` (#128).
+
+* New `PKG_BUILD_COLOR_DIAGNOSTICS` environment variable to opt out from
+  colored compiler output (#141).
+
+* pkgbuild now works with a full XCode installation if the XCode Command
+  Line Tools are not installed, on macOS, in RStudio (#103).
+
 # pkgbuild 1.3.1
 
 * Accept Rtools40 for R 4.2, it works well, as long as the PATH includes
@@ -129,6 +154,3 @@
   is run inside of `R CMD check`.
 
 * First argument of all functions is now `path` rather than `pkg`.
-
-
-

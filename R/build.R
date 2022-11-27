@@ -9,6 +9,55 @@
 #' only be installable on the current platform, but no development
 #' environment is needed.
 #'
+#' ## Configuration
+#'
+#' ### `DESCRIPTION` entries
+#'
+#' * `Config/build/clean-inst-doc` can be set to `FALSE` to avoid cleaning up
+#'   `inst/doc` when building a source package. Set it to `TRUE` to force a
+#'   cleanup. See the `clean_doc` argument.
+#'
+#' * `Config/build/copy-method` can be used to avoid copying large
+#'   directories in `R CMD build`. It works by copying (or linking) the
+#'   files of the package to a temporary directory, leaving out the
+#'   (possibly large) files that are not part of the package. Possible
+#'   values:
+#'
+#'   - `none`: pkgbuild does not copy the package tree. This is the default.
+#'   - `copy`: the package files are copied to a temporary directory before
+#'     ` R CMD build`.
+#'   - `link`: the package files are symbolic linked to a temporary
+#'     directory before `R CMD build`. Windows does not have symbolic
+#'     links, so on Windows this is equivalent to `copy`.
+#'
+#'   You can also use the `pkg.build_copy_method` option or the
+#'   `PKG_BUILD_COPY_METHOD` environment variable to set the copy method.
+#'   The option is consulted first, then the `DESCRIPTION` entry, then the
+#'   environment variable.
+#'
+#' ### Options
+#'
+#' * `pkg.build_copy_method`: use this option to avoid copying large
+#'   directories when building a package. See possible values above, at the
+#'   `Config/build/copy-method` `DESCRIPTION` entry.
+#'
+#' * `pkg.build_stop_for_warnings`: if it is set to `TRUE`, then pkgbuild
+#'   will stop for `R CMD build` errors. It takes precedence over the
+#'   `PKG_BUILD_STOP_FOR_WARNINGS` environment variable.
+#'
+#' ### Environment variables
+#'
+#' * `PKG_BUILD_COLOR_DIAGNOSTICS`: set it to `false` to opt out of colored
+#'  compiler diagnostics. Set it to `true` to force colored compiler
+#'  diagnostics.
+#'
+#' * `PKG_BUILD_COPY_METHOD`: use this environment variable to avoid copying
+#'   large directories when building a package. See possible values above,
+#'   at the `Config/build/copy-method` `DESCRIPTION` entry.
+#'
+#' will stop for `R CMD build` errors. The `pkg.build_stop_for_warnings`
+#' option takes precedence over this environment variable.
+#'
 #' @param path Path to a package, or within a package.
 #' @param dest_path path in which to produce package. If it is an existing
 #'   directory, then the output file is placed in `dest_path` and named
@@ -35,9 +84,11 @@
 #'   `tools::package_native_routine_registration_skeleton()` before building
 #'   the package. It is ignored if package does not need compilation.
 #' @param clean_doc If `TRUE`, clean the files in `inst/doc` before building
-#'   the package. If `NULL` and interactive, ask to remove the
-#'   files prior to cleaning. In most cases cleaning the files is the correct
-#'   behavior to avoid stale vignette outputs in the built package.
+#'   the package. If `NULL` and the `Config/build/clean-inst-doc` entry is
+#'   present in `DESCRIPTION`, then that is used. Otherwise, if `NULL`,
+#'   and interactive, ask to remove the files prior to cleaning. In most
+#'   cases cleaning the files is the correct behavior to avoid stale
+#'   vignette outputs in the built package.
 #' @export
 #' @return a string giving the location (including file name) of the built
 #'  package
@@ -45,13 +96,14 @@ build <- function(path = ".", dest_path = NULL, binary = FALSE, vignettes = TRUE
                   manual = FALSE, clean_doc = NULL, args = NULL, quiet = FALSE,
                   needs_compilation = pkg_has_src(path), compile_attributes = FALSE,
                   register_routines = FALSE) {
-
-  options <- build_setup(path, dest_path, binary, vignettes, manual, clean_doc, args,
-                         needs_compilation, compile_attributes, register_routines, quiet)
+  options <- build_setup(
+    path, dest_path, binary, vignettes, manual, clean_doc, args,
+    needs_compilation, compile_attributes, register_routines, quiet
+  )
   on.exit(unlink(options$out_dir, recursive = TRUE), add = TRUE)
 
   withr::local_makevars(compiler_flags(debug = FALSE), .assignment = "+=")
-  withr::with_temp_libpaths(
+  output <- withr::with_temp_libpaths(
     rcmd_build_tools(
       options$cmd,
       c(options$path, options$args),
@@ -61,6 +113,17 @@ build <- function(path = ".", dest_path = NULL, binary = FALSE, vignettes = TRUE
       quiet = quiet
     )
   )
+
+  if (should_stop_for_warnings() &&
+      grepl("\n\\s*warning:", output$stdout, ignore.case = TRUE)) {
+    cli::cli_alert_warning(
+      "Stopping as requested for a warning during {.code R CMD build}.")
+    if (quiet) {
+      cli::cli_alert_warning("The full output is printed below.")
+      cli::cli_verbatim(output$stdout)
+    }
+    stop("converted from `R CMD build` warning.")
+  }
 
   out_file <- dir(options$out_dir)
   file.copy(
@@ -77,7 +140,6 @@ build <- function(path = ".", dest_path = NULL, binary = FALSE, vignettes = TRUE
 
 build_setup <- function(path, dest_path, binary, vignettes, manual, clean_doc, args,
                         needs_compilation, compile_attributes, register_routines, quiet) {
-
   if (!file.exists(path)) {
     stop("`path` must exist", call. = FALSE)
   }
@@ -104,13 +166,14 @@ build_setup <- function(path, dest_path, binary, vignettes, manual, clean_doc, a
   if (binary) {
     build_setup_binary(path, dest_path, args, needs_compilation)
   } else {
-    build_setup_source(path, dest_path, vignettes, manual, clean_doc, args,
-                       needs_compilation)
+    build_setup_source(
+      path, dest_path, vignettes, manual, clean_doc, args,
+      needs_compilation
+    )
   }
 }
 
 build_setup_binary <- function(path, dest_path, args, needs_compilation) {
-
   if (needs_compilation) {
     check_build_tools(quiet = TRUE)
   }
@@ -130,7 +193,6 @@ build_setup_binary <- function(path, dest_path, args, needs_compilation) {
 
 build_setup_source <- function(path, dest_path, vignettes, manual, clean_doc,
                                args, needs_compilation) {
-
   if (!("--resave-data" %in% args)) {
     args <- c(args, "--no-resave-data")
   }
@@ -154,6 +216,9 @@ build_setup_source <- function(path, dest_path, vignettes, manual, clean_doc,
   }
 
   build_vignettes <- !("--no-build-vignettes" %in% args)
+  if (is.null(clean_doc)) {
+    clean_doc <- get_desc_config_flag(path, "clean-inst-doc")
+  }
   if (build_vignettes && (is.null(clean_doc) || isTRUE(clean_doc))) {
     doc_dir <- file.path(path, "inst", "doc")
     if (dir.exists(doc_dir)) {
@@ -171,6 +236,15 @@ build_setup_source <- function(path, dest_path, vignettes, manual, clean_doc,
   # Build in temporary directory and then copy to final location
   out_dir <- tempfile()
   dir.create(out_dir)
+
+  copy_method <- get_copy_method(path)
+
+  if (copy_method != "none") {
+    pkgname <- desc::desc_get("Package", path)
+    tmppath <- tempfile("build-")
+    copy_package_tree(path, tmppath, pkgname)
+    path <- file.path(tmppath, pkgname)
+  }
 
   list(
     cmd = "build",

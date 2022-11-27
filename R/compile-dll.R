@@ -7,6 +7,30 @@
 #'
 #' Invisibly returns the names of the DLL.
 #'
+#' ## Configuration
+#'
+#' ### Options
+#'
+#' * `pkg.build_extra_flags`: set this to `FALSE` to to opt out from adding
+#'   debug compiler flags in `compile_dll()`. Takes precedence over the
+#'   `PKG_BUILD_EXTRA_FLAGS` environment variable. Possible values:
+#'
+#'   - `TRUE`: add extra flags,
+#'   - `FALSE`: do not add extra flags,
+#'   - `"missing"`: add extra flags if the user does not have a
+#'     `$HOME/.R/Makevars` file.
+#'
+#' ### Environment variables
+#'
+#' * `PKG_BUILD_EXTRA_FLAGS`: set this to `false` to to opt out from adding
+#'   debug compiler flags in `compile_dll()`. The `pkg.build_extra_flags` option
+#'   takes precedence over this environment variable. Possible values:
+#'
+#'   - `"true"`: add extra flags,
+#'   - `"false"`: do not add extra flags,
+#'   - `"missing"`: add extra flags if the user does not have a
+#'     `$HOME/.R/Makevars` file.
+#'
 #' @note If this is used to compile code that uses Rcpp, you will need to
 #'   add the following line to your `Makevars` file so that it
 #'   knows where to find the Rcpp headers:
@@ -37,33 +61,28 @@ compile_dll <- function(path = ".",
   update_registration(path, compile_attributes, register_routines, quiet)
 
   # Mock install the package to generate the DLL
-  if (!quiet)
-    message("Re-compiling ", pkg_name(path))
+  if (!quiet) {
+    cli::cli_alert_info(c(
+      "Re-compiling {.pkg {pkg_name(path)}}",
+      if (debug) " (debug build)"
+    ))
+  }
 
   install_dir <- tempfile("devtools_install_")
   dir.create(install_dir)
 
-  # If the user has a makevars file just use that
-  if (length(makevars_user()) > 0) {
-    install_min(
-      path,
-      dest = install_dir,
-      components = "libs",
-      args = if (needs_clean(path)) "--preclean",
-      quiet = quiet
-    )
-  } else {
-    # Otherwise set makevars for fast development / debugging
-    withr::with_makevars(compiler_flags(debug), assignment = "+=", {
-      install_min(
-        path,
-        dest = install_dir,
-        components = "libs",
-        args = if (needs_clean(path)) "--preclean",
-        quiet = quiet
-        )
-    })
+  if (should_add_compiler_flags()) {
+    withr::local_makevars(compiler_flags(debug), .assignment = "+=")
+    if (debug) withr::local_envvar(DEBUG = "true")
   }
+
+  install_min(
+    path,
+    dest = install_dir,
+    components = "libs",
+    args = if (needs_clean(path)) "--preclean",
+    quiet = quiet
+  )
 
   invisible(dll_path(file.path(install_dir, pkg_name(path))))
 }
@@ -105,14 +124,19 @@ dll_path <- function(path = ".") {
 
 mtime <- function(x) {
   x <- x[file.exists(x)]
-  if (length(x) == 0) return(NULL)
+  if (length(x) == 0) {
+    return(NULL)
+  }
   max(file.info(x)$mtime)
 }
 
 # List all source files in the package
 sources <- function(path = ".") {
   srcdir <- file.path(path, "src")
-  dir(srcdir, "\\.(c.*|f)$", recursive = TRUE, full.names = TRUE)
+  c(
+    dir(srcdir, "\\.(c.*|f|rs)$", recursive = TRUE, full.names = TRUE),
+    dir(srcdir, "^Cargo\\.toml$", recursive = TRUE, full.names = TRUE)
+  )
 }
 
 # List all header files in the package
@@ -136,11 +160,15 @@ headers <- function(path = ".") {
 needs_compile <- function(path = ".") {
   source <- mtime(c(sources(path), headers(path)))
   # no source files, so doesn't need compile
-  if (is.null(source)) return(FALSE)
+  if (is.null(source)) {
+    return(FALSE)
+  }
 
   dll <- mtime(dll_path(path))
   # no dll, so needs compile
-  if (is.null(dll)) return(TRUE)
+  if (is.null(dll)) {
+    return(TRUE)
+  }
 
   source > dll
 }
@@ -150,11 +178,15 @@ needs_compile <- function(path = ".") {
 needs_clean <- function(path = ".") {
   headers <- mtime(headers(path))
   # no headers, so never needs clean compile
-  if (is.null(headers)) return(FALSE)
+  if (is.null(headers)) {
+    return(FALSE)
+  }
 
   dll <- mtime(dll_path(path))
   # no dll, so needs compile
-  if (is.null(dll)) return(TRUE)
+  if (is.null(dll)) {
+    return(TRUE)
+  }
 
   headers > dll
 }
