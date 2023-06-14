@@ -1,7 +1,21 @@
+# pkgbuild 1.4.1
+
+* New `Config/build/extra-sources` `DESCRIPTION` option to make pkgbuild aware
+  of extra source files to consider in `needs_compile()`.
+
+* New `Config/build/bootstrap` `DESCRIPTION` option. Set it to `TRUE` to run
+  `Rscript bootstrap.R` in the package root prior to building the source
+  package (#157, @paleolimbot).
+
+* pkgbuild now supports Rtools43.
+
+* pkgbuild now always _appends_ its extra compiler flags to the ones that
+  already exist in the system and/or user `Makevars` files (#156).
+
 # pkgbuild 1.4.0
 
 * pkgbuild can now avoid copying large package directories when building a
-  source package. See the `PKG_BUILD_COPY_METHOD` enviroment variable in
+  source package. See the `PKG_BUILD_COPY_METHOD` environment variable in
   `?build` or the package README (#59).
 
   This is currently an experimental feature, and feedback is
@@ -50,7 +64,7 @@
 
 * Gábor Csárdi is now the maintainer.
 
-* `build_setup_source` now considerers both command-line build arguments, as
+* `build_setup_source` now considers both command-line build arguments, as
   well as parameters `vignettes` or `manual` when conditionally executing
   flag-dependent behaviors (@dgkf, #120)
 

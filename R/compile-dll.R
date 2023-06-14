@@ -61,30 +61,40 @@ compile_dll <- function(path = ".",
   update_registration(path, compile_attributes, register_routines, quiet)
 
   # Mock install the package to generate the DLL
+  xflags <- should_add_compiler_flags()
   if (!quiet) {
     cli::cli_alert_info(c(
       "Re-compiling {.pkg {pkg_name(path)}}",
-      if (debug) " (debug build)"
+      if (debug && xflags) " (debug build)"
     ))
   }
 
   install_dir <- tempfile("devtools_install_")
   dir.create(install_dir)
 
-  if (should_add_compiler_flags()) {
-    withr::local_makevars(compiler_flags(debug), .assignment = "+=")
-    if (debug) withr::local_envvar(DEBUG = "true")
+  build <- function() {
+    install_min(
+      path,
+      dest = install_dir,
+      components = "libs",
+      args = if (needs_clean(path)) "--preclean",
+      quiet = quiet
+    )
+
+    invisible(dll_path(file.path(install_dir, pkg_name(path))))
   }
 
-  install_min(
-    path,
-    dest = install_dir,
-    components = "libs",
-    args = if (needs_clean(path)) "--preclean",
-    quiet = quiet
-  )
-
-  invisible(dll_path(file.path(install_dir, pkg_name(path))))
+  if (xflags) {
+    withr_with_makevars(compiler_flags(debug), {
+      if (debug) {
+        withr_with_envvar(c(DEBUG = "true"), build())
+      } else {
+        build()
+      }
+    })
+  } else {
+    build()
+  }
 }
 
 #' Remove compiled objects from /src/ directory
@@ -130,13 +140,34 @@ mtime <- function(x) {
   max(file.info(x)$mtime)
 }
 
+globs <- function(path = ".", x) {
+  old <- getwd()
+  on.exit(setwd(old), add = TRUE)
+  setwd(path)
+  Sys.glob(x)
+}
+
 # List all source files in the package
 sources <- function(path = ".") {
   srcdir <- file.path(path, "src")
-  c(
+  src <- c(
     dir(srcdir, "\\.(c.*|f|rs)$", recursive = TRUE, full.names = TRUE),
     dir(srcdir, "^Cargo\\.toml$", recursive = TRUE, full.names = TRUE)
   )
+  extra <- desc::desc_get("Config/build/extra-sources", path)
+
+  if (!is.na(extra)) {
+    glb <- trimws(strsplit(extra, ",", fixed = TRUE)[[1]])
+    xs <- file.path(path, globs(path, glb))
+    xfls <- unlist(lapply(
+      xs,
+      dir,
+      recursive = TRUE,
+      full.names = TRUE
+    ))
+    src <- c(src, xs, xfls)
+  }
+  src
 }
 
 # List all header files in the package

@@ -35,6 +35,16 @@
 #'   The option is consulted first, then the `DESCRIPTION` entry, then the
 #'   environment variable.
 #'
+#' * `Config/build/extra-sources` can be used to define extra source files
+#'   for pkgbuild to decide whether a package DLL needs to be recompiled in
+#'   `needs_compile()`. The syntax is a comma separated list of file names,
+#'   or globs. (See [utils::glob2rx()].) E.g. `src/rust/src/*.rs` or
+#'   `configure*`.
+#'
+#' * `Config/build/bootstrap` can be set to `TRUE` to run
+#'   `Rscript bootstrap.R` in the source directory prior to running subsequent
+#'   build steps.
+#'
 #' ### Options
 #'
 #' * `pkg.build_copy_method`: use this option to avoid copying large
@@ -102,40 +112,43 @@ build <- function(path = ".", dest_path = NULL, binary = FALSE, vignettes = TRUE
   )
   on.exit(unlink(options$out_dir, recursive = TRUE), add = TRUE)
 
-  withr::local_makevars(compiler_flags(debug = FALSE), .assignment = "+=")
-  output <- withr::with_temp_libpaths(
-    rcmd_build_tools(
-      options$cmd,
-      c(options$path, options$args),
-      wd = options$out_dir,
-      fail_on_status = TRUE,
-      required = FALSE, # already checked in setup
-      quiet = quiet
-    )
-  )
+  withr_with_makevars(
+    compiler_flags(debug = FALSE), {
+      output <- withr_with_temp_libpaths(
+        rcmd_build_tools(
+          options$cmd,
+          c(options$path, options$args),
+          wd = options$out_dir,
+          fail_on_status = TRUE,
+          required = FALSE, # already checked in setup
+          quiet = quiet
+        )
+      )
 
-  if (should_stop_for_warnings() &&
-      grepl("\n\\s*warning:", output$stdout, ignore.case = TRUE)) {
-    cli::cli_alert_warning(
-      "Stopping as requested for a warning during {.code R CMD build}.")
-    if (quiet) {
-      cli::cli_alert_warning("The full output is printed below.")
-      cli::cli_verbatim(output$stdout)
+      if (should_stop_for_warnings() &&
+          grepl("\n\\s*warning:", output$stdout, ignore.case = TRUE)) {
+        cli::cli_alert_warning(
+               "Stopping as requested for a warning during {.code R CMD build}.")
+        if (quiet) {
+          cli::cli_alert_warning("The full output is printed below.")
+          cli::cli_verbatim(output$stdout)
+        }
+        stop("converted from `R CMD build` warning.")
+      }
+
+      out_file <- dir(options$out_dir)
+      file.copy(
+        file.path(options$out_dir, out_file), options$dest_path,
+        overwrite = TRUE
+      )
+
+      if (is_dir(options$dest_path)) {
+        file.path(options$dest_path, out_file)
+      } else {
+        options$dest_path
+      }
     }
-    stop("converted from `R CMD build` warning.")
-  }
-
-  out_file <- dir(options$out_dir)
-  file.copy(
-    file.path(options$out_dir, out_file), options$dest_path,
-    overwrite = TRUE
   )
-
-  if (is_dir(options$dest_path)) {
-    file.path(options$dest_path, out_file)
-  } else {
-    options$dest_path
-  }
 }
 
 build_setup <- function(path, dest_path, binary, vignettes, manual, clean_doc, args,
@@ -157,6 +170,19 @@ build_setup <- function(path, dest_path, binary, vignettes, manual, clean_doc, a
 
   if (is.null(dest_path)) {
     dest_path <- dirname(path)
+  }
+
+  bootstrap_file <- file.path(path, "bootstrap.R")
+  run_boostrap <- isTRUE(get_desc_config_flag(path, "bootstrap"))
+  if (file.exists(bootstrap_file) && run_boostrap) {
+    if (!quiet) message("Running bootstrap.R...")
+
+    callr::rscript(
+      bootstrap_file,
+      wd = path,
+      stderr = "2>&1",
+      show = !quiet
+    )
   }
 
   if (needs_compilation) {

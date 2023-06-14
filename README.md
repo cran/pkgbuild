@@ -9,11 +9,17 @@ The goal of pkgbuild is to make it easy to build packages with compiled code. It
 
 ## Installation
 
-You can install pkgbuild from github with:
+ Install the released version from CRAN
+ 
+```r
+install.packages("pkgbuild")
+```
 
-``` r
-# install.packages("devtools")
-devtools::install_github("r-lib/pkgbuild")
+Or install the development version from GitHub:
+
+```r
+# install.packages("pak")
+pak::pak("r-lib/pkgbuild")
 ```
 
 ## Example
@@ -54,6 +60,11 @@ pkgbuild::with_build_tools(my_code)
   `PKG_BUILD_COPY_METHOD` environment variable to set the copy method.
   The option is consulted first, then the `DESCRIPTION` entry, then the
   environment variable.
+
+* `Config/build/extra-sources` can be used to define extra source files for
+  pkgbuild to decide whether a package DLL needs to be recompiled in
+  `needs_compile()`. The syntax is a comma separated list of file names,
+  or globs. (See `?utils::glob2rx()`.) E.g. `src/rust/src/*.rs` or `configure*`.
 
 ### Options
 
@@ -100,5 +111,5 @@ pkgbuild::with_build_tools(my_code)
 ## Code of Conduct
 
 Please note that the pkgbuild project is released with a
-[Contributor Code of Conduct](https://r-lib.github.io/pkgbuild/CODE_OF_CONDUCT.html).
+[Contributor Code of Conduct](https://pkgbuild.r-lib.org/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
