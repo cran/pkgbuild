@@ -1,3 +1,8 @@
+# pkgbuild 1.4.2
+
+* Running `bootstrap.R` now works with `pkgbuild_process`, so it also works
+  from pak (https://github.com/r-lib/pak/issues/508).
+
 # pkgbuild 1.4.1
 
 * New `Config/build/extra-sources` `DESCRIPTION` option to make pkgbuild aware
