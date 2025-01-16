@@ -1,14 +1,14 @@
-c26a4d0d88ccbbebb13b802509149ef7 *DESCRIPTION
+367894025c23bb0584551003cbc6d7bc *DESCRIPTION
 faf2baf0ecd138dc63fc451973987996 *LICENSE
 5fba5a95f84bcf1d2405e167c7ecd4e6 *NAMESPACE
-52223f62f4f8c54572c30682177b0395 *NEWS.md
+95202de50236eabf94754530df405421 *NEWS.md
 78b67ff42c1a26e46729aed96cf409b3 *R/build-bg.R
 a62051336b2cb8b37c23d0e0aae56d29 *R/build-tools.R
 5332a09284986d079d102f7380c76472 *R/build.R
 2b9ad84f281faa439fe10c04532d422d *R/c-registration.R
 8d41d120d4955be4a6fe8607ea96c174 *R/cache.R
 21454efb84eb5a18056bdf7398f36674 *R/callback.R
-7b0848d2a79d737edd2d2a882d0e3715 *R/compile-dll.R
+a51b149c4f4bcd688a685a5420bf6e1b *R/compile-dll.R
 da3c666884c5f7d0f9ffa01800ac311e *R/compiler-flags.R
 f1a406e5772d7ec1c4795c361113c006 *R/compiler.R
 f370d4cc2301e8e38560135eeee1d221 *R/exclude.R
@@ -31,7 +31,7 @@ ca568b62a08ace7ea4eaf33046f3a716 *R/utils.R
 714cd2029e57f398bf9f9f1ff4c32702 *README.md
 3280a80f4395a1db1f24ac6608cc6f70 *man/build.Rd
 b16255149b3caf04d128de8053594c71 *man/clean_dll.Rd
-3c9fa4f2463b025b9b38c8cfcda4db51 *man/compile_dll.Rd
+a70b813a724ad7f3764e529d7312ad24 *man/compile_dll.Rd
 73f325dcf528758ff067b0603c6a048e *man/compiler_flags.Rd
 2389b5cc2aa56411e3b30d0e62b7263a *man/has_build_tools.Rd
 b770baba0361a4388737b429b699950f *man/has_compiler.Rd
@@ -71,7 +71,7 @@ b75ef7003cf9f964bae1a982db785d43 *tests/testthat/test-c-registration.R
 23c6b10149131f166dd683ce86949bca *tests/testthat/test-rtools.R
 def62e429ecb3dd1b190da179e097064 *tests/testthat/test-style.R
 93331678b5ae08cdaff113ca05b43d51 *tests/testthat/test-utils.R
-f2ccf899dbafd628e8fae8357dfdbe63 *tests/testthat/test-withr.R
+d3165c6675f90698864e6c119b68454d *tests/testthat/test-withr.R
 3d687f7cc510f4b045ab5379a1546cfc *tests/testthat/testDummy/DESCRIPTION
 85601cb90b291bb14a88bc9e7349b653 *tests/testthat/testDummy/NAMESPACE
 26813d0f7f8e272af05102662163c53b *tests/testthat/testDummy/R/a.R
